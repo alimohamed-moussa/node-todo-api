@@ -10,7 +10,6 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
-
 var app = express();
 const port = process.env.PORT;
 
@@ -46,7 +45,7 @@ app.get('/todos/:id', authenticate, (req, res) => {
     return res.status(404).send();
   }
 
-  Todo.findByOne({
+  Todo.findOne({
     _id: id,
     _creator: req.user._id
   }).then((todo) => {
@@ -96,10 +95,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
     body.completedAt = null;
   }
 
-  Todo.findOneAndUpdate({
-    _id: id,
-    _creator:req.user._id
-  }, {$set: body}, {new: true}).then((todo) => {
+  Todo.findOneAndUpdate({_id: id, _creator: req.user._id}, {$set: body}, {new: true}).then((todo) => {
     if (!todo) {
       return res.status(404).send();
     }
@@ -141,11 +137,11 @@ app.post('/users/login', (req, res) => {
 });
 
 app.delete('/users/me/token', authenticate, (req, res) => {
-    req.user.removeToken(req.token).then(() => {
-      res.status(200).send();
-    }, () => {
-      res.status(400).send();
-    });
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
 });
 
 app.listen(port, () => {
